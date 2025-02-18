@@ -1,6 +1,6 @@
-return { -- Highlight, edit, and navigate code
+ return { -- Highlight, edit, and navigate code
   'nvim-treesitter/nvim-treesitter',
-  build = ':TSUpdate',
+  --build = ':TSUpdate',
   main = 'nvim-treesitter.configs', -- Sets main module to use for opts
   opts = {
     ensure_installed = { 'bash', 'c', 'cpp', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc'},
@@ -12,6 +12,6 @@ return { -- Highlight, edit, and navigate code
       --  the list of additional_vim_regex_highlighting and disabled languages for indent.
       additional_vim_regex_highlighting = { 'ruby' },
     },
-    indent = { enable = true, disable = { 'ruby' } },
+    --indent = { enable = true, disable = { 'ruby' } },
   },
 }

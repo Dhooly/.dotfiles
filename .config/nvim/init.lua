@@ -1,3 +1,5 @@
+-- vim.opt.rtp:append(vim.fn.stdpath "config" .. ",/home/daniel/.local/share/nvim/nvim/runtime")
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
@@ -15,12 +17,12 @@ vim.opt.breakindent = true
 
 vim.opt.undofile = true
 
--- Enable auto-indentation
+-- -- Enable auto-indentation
 vim.o.autoindent = true
 vim.o.smartindent = true
 vim.o.cindent = true
-
--- Tab and space settings for consistent alignment
+--
+-- -- Tab and space settings for consistent alignment
 vim.o.tabstop = 2
 vim.o.shiftwidth = 2
 vim.o.softtabstop = 2

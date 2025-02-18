@@ -66,5 +66,10 @@ return {
     vim.keymap.set('n', '<leader>sn', function()
       builtin.find_files { cwd = vim.fn.stdpath 'config' }
     end, { desc = '[S]earch [N]eovim files' })
+
+    -- Shortcut for searching files from home
+    vim.keymap.set('n', '<leader>sa', function()
+      builtin.find_files { cwd = vim.env.HOME }
+    end, { desc = '[S]earch [A]ll files' })
   end,
 }
