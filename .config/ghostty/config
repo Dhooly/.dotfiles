@@ -1,0 +1,15 @@
+theme = GruvboxDark
+
+font-size = 10
+font-family = "Monaco for Powerline"
+adjust-cell-height = 3
+
+cursor-style = block
+cursor-opacity = 50
+cursor-style-blink = true
+
+clipboard-read = allow
+clipboard-write = allow
+clipboard-trim-trailing-spaces
+
+window-theme = dark
