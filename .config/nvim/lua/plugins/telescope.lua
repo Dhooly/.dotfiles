@@ -44,6 +44,30 @@ return {
     vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
     vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
+        -- List LSP symbols
+    -- vim.keymap.set("n", "<leader>pl", ":Telescope lsp_document_symbols<CR>", { desc = "List LSP symbols in file" })
+    -- vim.keymap.set("n", "<leader>pL", ":Telescope lsp_workspace_symbols<CR>", { desc = "List LSP symbols in workspace" })
+
+    -- Incoming and Outgoing calls
+    vim.keymap.set("n", "<leader>si", function()
+      require('telescope.builtin').lsp_incoming_calls()
+    end, { desc = "Show incoming calls (who calls this function)" })
+    vim.keymap.set("n", "<leader>so", function()
+      require('telescope.builtin').lsp_outgoing_calls()
+    end, { desc = "Show outgoing calls (functions this calls)" })
+
+    -- Jump to definitions
+    vim.keymap.set("n", "<leader>sd", function()
+      vim.lsp.buf.definition()
+    end, { desc = "Jump to function definition" })
+    vim.keymap.set("n", "<leader>sft", function()
+      vim.lsp.buf.type_definition()
+    end, { desc = "Jump to type definition" })
+
+    vim.keymap.set("n", "<leader>sr", function()
+      require('telescope.builtin').lsp_references()
+    end, { desc = "Show function references" })
+
     -- Slightly advanced example of overriding default behavior and theme
     vim.keymap.set('n', '<leader>/', function()
       -- You can pass additional configuration to Telescope to change the theme, layout, etc.
