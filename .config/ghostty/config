@@ -2,6 +2,7 @@ theme = GruvboxDark
 
 font-size = 10
 font-family = "Monaco for Powerline"
+font-family = "MesloLGS Nerd Font Mono"
 adjust-cell-height = 3
 
 cursor-style = block

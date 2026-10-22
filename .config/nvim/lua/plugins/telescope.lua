@@ -4,7 +4,6 @@ return {
   event = 'VimEnter',
   branch = '0.1.x',
   dependencies = {
-    'hrsh7th/nvim-cmp',
     'nvim-lua/plenary.nvim',
     { 'nvim-telescope/telescope-ui-select.nvim' },
 
@@ -41,7 +40,10 @@ return {
     vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
     vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
     vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-    vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+    vim.keymap.set('n', '<leader>sg', function()
+      builtin.live_grep()
+    end, { desc = '[S]earch by [G]rep' })
+    -- vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
     vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
         -- List LSP symbols
@@ -60,7 +62,7 @@ return {
     vim.keymap.set("n", "<leader>sd", function()
       vim.lsp.buf.definition()
     end, { desc = "Jump to function definition" })
-    vim.keymap.set("n", "<leader>sft", function()
+    vim.keymap.set("n", "<leader>st", function()
       vim.lsp.buf.type_definition()
     end, { desc = "Jump to type definition" })
 

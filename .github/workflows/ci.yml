@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    name: Shell checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install --yes shellcheck tmux zsh
+      - name: Test and lint
+        run: make check
+      - name: Validate Zsh configuration
+        run: zsh -n .zprofile .zshrc
+      - name: Validate tmux configuration
+        run: |
+          tmux -L dotfiles-ci -f /dev/null new-session -d
+          tmux -L dotfiles-ci source-file "$PWD/.tmux.conf"
+          tmux -L dotfiles-ci kill-server
+
+  macos-dry-run:
+    name: macOS dry run
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate bootstrap
+        run: ./bootstrap.sh --dry-run --yes --skip-oh-my-zsh --skip-tmux-plugins --skip-shell-change
+
+  fedora-dry-run:
+    name: Fedora dry run
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate bootstrap
+        run: ./bootstrap.sh --dry-run --yes --skip-oh-my-zsh --skip-tmux-plugins --skip-shell-change
+

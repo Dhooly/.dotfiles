@@ -1,0 +1,10 @@
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Local machine overrides and generated editor artifacts.
+*.local
+.config/nvim/lazy-lock.json.bak
+.config/nvim/lua/plugins/core.*
+

@@ -24,7 +24,7 @@ return {
     },
     { '<leader>xt', '<cmd>TodoTrouble<cr>', desc = '[t]odo list (all)' },
     { '<leader>xT', '<cmd>TodoTrouble keywords=TODO,FIX,FIXME<cr>', desc = '[T]odo/Fix/Fixme list' },
-    { '<leader>st', '<cmd>TodoTelescope<cr>', desc = '[t]odo' },
-    { '<leader>sT', '<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>', desc = '[T]odo/Fix/Fixme' },
+    { '<leader>sc', '<cmd>TodoTelescope<cr>', desc = '[S]earch [C]omments' },
+    { '<leader>sC', '<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>', desc = '[S]earch fix [C]omments' },
   },
 }

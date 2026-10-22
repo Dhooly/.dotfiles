@@ -56,12 +56,38 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-vim.keymap.set("n", "<leader>la", 'oamps_logger::LOG("%d %s", __LINE__, __func__);<Esc>', {desc = "Insert AMPS Logger"})
-
 vim.keymap.set("n", "<leader>sw", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
   { desc = "Search and replace word under cursor" })
 
--- Build Keymap, looks towards root from current file for 'build' dir and runs make install in it
+-- bufferline.nvim remaps:
+vim.opt.termguicolors = true  -- Enables 24-bit RGB colors (Bufferline won't load without this)
+vim.opt.showtabline = 2      -- Always show the tabline at the top
+
+-- ====================================================================
+-- BUFFERLINE NAVIGATION KEYMAPS (Vim-oriented hjkl)
+-- ====================================================================
+
+-- 1. SWITCH BETWEEN TABS (Shift + h / Shift + l)
+-- Press Shift+H to go left, Shift+L to go right
+vim.keymap.set('n', '<S-h>', ':BufferLineCyclePrev<CR>', { silent = true, desc = 'Go to previous tab' })
+vim.keymap.set('n', '<S-l>', ':BufferLineCycleNext<CR>', { silent = true, desc = 'Go to next tab' })
+
+-- 2. REORDER / MOVE TABS (Leader + Shift + h / l)
+-- Move the current visual tab left or right in the top bar
+vim.keymap.set('n', '<C-S-h>', ':BufferLineMovePrev<CR>', { silent = true, desc = 'Move tab left' })
+vim.keymap.set('n', '<C-S-l>', ':BufferLineMoveNext<CR>', { silent = true, desc = 'Move tab right' })
+
+-- 3. CLOSE/DELETE A TAB (Leader + x)
+-- Closes the current open file safely
+vim.keymap.set('n', '<leader>d', ':bdelete<CR>', { silent = true, desc = 'Close current tab' })
+
+
+local user_bin = vim.fn.expand('~/bin')
+if vim.fn.isdirectory(user_bin) == 1 then
+  vim.env.PATH = vim.env.PATH .. ':' .. user_bin
+end
+
+-- Build Keymap: find the nearest build directory and run CMake's install target.
 vim.keymap.set('n', '<C-g>', function()
   -- Check if the current buffer has unsaved changes
   if vim.bo.modified then
@@ -92,7 +118,7 @@ vim.keymap.set('n', '<C-g>', function()
   -- Save current window before opening the terminal
   local original_win = vim.api.nvim_get_current_win()
 
-  local cmd = 'make -j $(nproc) install'
+  local cmd = 'cmake --build . --parallel --target install'
   vim.cmd('botright split | resize 10 | terminal')
 
   -- Get terminal buffer and window
@@ -107,9 +133,9 @@ vim.keymap.set('n', '<C-g>', function()
     end
   end
 
-  -- Run the make command
+  -- Run the build command
   vim.fn.chansend(vim.b.terminal_job_id,
-    'cd ' .. build_dir .. ' && ' .. cmd .. ' && exit || read -p "Press enter to continue..."\n')
+    'cd ' .. vim.fn.shellescape(build_dir) .. ' && ' .. cmd .. ' && exit || read -p "Press enter to continue..."\n')
 
   -- Switch back to the original window
   vim.api.nvim_set_current_win(original_win)
@@ -126,6 +152,7 @@ vim.cmd [[
     autocmd!
     autocmd BufRead,BufNewFile *.test set filetype=python
     autocmd BufRead,BufNewFile *.stage set filetype=python
+    autocmd BufRead,BufNewFile *.stress set filetype=python
   augroup END
 ]]
 
