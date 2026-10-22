@@ -188,6 +188,16 @@ main()
   check_optional_command 'pnpm' pnpm
   check_optional_command 'zoxide' zoxide
 
+  if [ "$DF_PROFILE" = 'full' ]; then
+    info 'Fonts'
+    if monaco_for_powerline_is_installed; then
+      success 'Monaco for Powerline is installed'
+    else
+      warn 'Monaco for Powerline is not installed'
+      DF_FAILURES=$((DF_FAILURES + 1))
+    fi
+  fi
+
   info 'Configuration links'
   check_link_paths \
     "$HOME/.config/ghostty/config" \

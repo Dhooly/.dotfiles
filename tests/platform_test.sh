@@ -53,6 +53,22 @@ assert_array_excludes()
   done
 }
 
+assert_contains()
+{
+  local expected_="$1"
+  local actual_="$2"
+  local label_="$3"
+
+  case "$actual_" in
+    *"$expected_"*)
+      return 0
+      ;;
+  esac
+
+  printf 'FAIL: %s does not contain %s\n' "$label_" "$expected_" >&2
+  exit 1
+}
+
 write_os_release()
 {
   local id_="$1"
@@ -105,6 +121,24 @@ DOTFILES_OS_RELEASE_FILE="$TEST_TMP/does-not-exist"
 detect_platform
 assert_equal macos "$DF_OS" 'macOS OS'
 assert_equal brew "$DF_PACKAGE_MANAGER" 'macOS package manager'
+
+# Monaco for Powerline uses the native per-user font directory on each OS.
+DF_DRY_RUN=1
+HOME="$TEST_TMP/mac-home"
+DF_FAMILY='macos'
+monaco_output_="$(ensure_monaco_for_powerline)"
+assert_contains \
+  "$HOME/Library/Fonts/Monaco_Linux-Powerline.ttf" \
+  "$monaco_output_" \
+  'macOS Monaco font destination'
+
+HOME="$TEST_TMP/linux-home"
+DF_FAMILY='arch'
+monaco_output_="$(ensure_monaco_for_powerline)"
+assert_contains \
+  "$HOME/.local/share/fonts/Monaco_Linux-Powerline.ttf" \
+  "$monaco_output_" \
+  'Linux Monaco font destination'
 
 printf 'All platform detection tests passed.\n'
 

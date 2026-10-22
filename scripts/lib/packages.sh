@@ -236,6 +236,82 @@ ensure_nerd_font()
   )
 }
 
+monaco_for_powerline_is_installed()
+{
+  local ghostty_command_=''
+
+  if command_exists fc-match &&
+    fc-match --format='%{family}\n' 'Monaco for Powerline' 2>/dev/null |
+      grep -Fi 'Monaco for Powerline' >/dev/null; then
+    return 0
+  fi
+
+  if command_exists ghostty; then
+    ghostty_command_="$(command -v ghostty)"
+  elif [ -x /Applications/Ghostty.app/Contents/MacOS/ghostty ]; then
+    ghostty_command_='/Applications/Ghostty.app/Contents/MacOS/ghostty'
+  fi
+
+  [ -n "$ghostty_command_" ] &&
+    "$ghostty_command_" +list-fonts 2>/dev/null |
+      grep -Fx 'Monaco for Powerline' >/dev/null
+}
+
+ensure_monaco_for_powerline()
+{
+  local font_root_=''
+  local font_path_=''
+  local download_url_='https://gist.githubusercontent.com/epegzz/1634235/raw/4691e901750591f9cab0b4ae8b7c0731ebf28cce/Monaco_Linux-Powerline.ttf'
+
+  if monaco_for_powerline_is_installed; then
+    success 'Monaco for Powerline is installed'
+    return 0
+  fi
+
+  if [ "$DF_FAMILY" = 'macos' ]; then
+    font_root_="$HOME/Library/Fonts"
+  else
+    font_root_="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
+  fi
+  font_path_="$font_root_/Monaco_Linux-Powerline.ttf"
+
+  info 'Installing Monaco for Powerline for the current user'
+  if [ "${DF_DRY_RUN:-0}" -eq 1 ]; then
+    printf '    download %s\n' "$download_url_"
+    printf '    install font as %s\n' "$font_path_"
+    return 0
+  fi
+
+  (
+    local temporary_
+    local downloaded_font_
+    local signature_
+
+    temporary_="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-monaco-font.XXXXXX")"
+    downloaded_font_="$temporary_/Monaco_Linux-Powerline.ttf"
+    trap 'rm -rf "${temporary_:?}"' EXIT HUP INT TERM
+
+    curl --fail --location --retry 3 --output "$downloaded_font_" "$download_url_"
+    signature_="$(od -An -tx1 -N4 "$downloaded_font_" | tr -d ' \n')"
+    case "$signature_" in
+      00010000|4f54544f|74746366)
+        ;;
+      *)
+        die 'The Monaco for Powerline download is not a recognized font file.'
+        ;;
+    esac
+
+    mkdir -p "$font_root_"
+    install -m 0644 "$downloaded_font_" "$font_path_"
+
+    if [ "$DF_FAMILY" != 'macos' ] && command_exists fc-cache; then
+      fc-cache -f "$font_root_"
+    fi
+  )
+
+  success 'Installed Monaco for Powerline'
+}
+
 select_packages()
 {
   local profile_="$1"
@@ -357,6 +433,7 @@ install_packages()
   ensure_current_neovim
 
   if [ "$profile_" = 'full' ]; then
+    ensure_monaco_for_powerline
     ensure_nerd_font
   fi
 }
