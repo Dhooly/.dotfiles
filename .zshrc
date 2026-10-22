@@ -1,6 +1,6 @@
 export ZSH="${ZSH:-$HOME/.oh-my-zsh}"
 export ZSH_CUSTOM="${ZSH_CUSTOM:-$ZSH/custom}"
-ZSH_THEME="robbyrussell"
+ZSH_THEME="agnoster"
 
 # Graphical terminals on Linux often start a non-login shell, so keep these
 # paths here as well as in .zprofile.

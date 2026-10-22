@@ -67,8 +67,8 @@ Zsh, tmux plugins, or the default-shell change.
 
 ## What gets configured
 
-- Zsh with Oh My Zsh, autosuggestions, syntax highlighting, shared history,
-  completions, and lightweight cross-platform aliases
+- Zsh with Oh My Zsh's Agnoster prompt, autosuggestions, syntax highlighting,
+  shared history, completions, and lightweight cross-platform aliases
 - tmux with TPM, sensible defaults, the existing SSH-split and mouse plugins,
   portable clipboard integration, and seamless Neovim pane navigation
 - Neovim with the existing Gruvbox, Telescope, Treesitter, Harpoon, Bufferline,
