@@ -13,6 +13,8 @@ trap 'rm -rf "${TEST_TMP:?}"' EXIT HUP INT TERM
 # shellcheck source=../scripts/lib/packages.sh
 . "$TEST_ROOT/scripts/lib/packages.sh"
 
+EXPECTED_MONACO_FONT_URL='https://gist.github.com/dsc8x/1634235/raw/4691e901750591f9cab0b4ae8b7c0731ebf28cce/Monaco_Linux-Powerline.ttf'
+
 assert_equal()
 {
   local expected_="$1"
@@ -98,6 +100,8 @@ test_linux_distribution fedora '' fedora dnf
 test_linux_distribution ubuntu debian debian apt
 test_linux_distribution debian '' debian apt
 test_linux_distribution pop 'ubuntu debian' debian apt
+
+assert_equal "$EXPECTED_MONACO_FONT_URL" "$DF_MONACO_FONT_URL" 'Monaco font source URL'
 
 test_linux_distribution cachyos arch arch pacman
 select_packages core

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+DF_MONACO_FONT_URL='https://gist.github.com/dsc8x/1634235/raw/4691e901750591f9cab0b4ae8b7c0731ebf28cce/Monaco_Linux-Powerline.ttf'
+
 ensure_homebrew()
 {
   local brew_command_=''
@@ -261,7 +263,6 @@ ensure_monaco_for_powerline()
 {
   local font_root_=''
   local font_path_=''
-  local download_url_='https://gist.githubusercontent.com/epegzz/1634235/raw/4691e901750591f9cab0b4ae8b7c0731ebf28cce/Monaco_Linux-Powerline.ttf'
 
   if monaco_for_powerline_is_installed; then
     success 'Monaco for Powerline is installed'
@@ -277,7 +278,7 @@ ensure_monaco_for_powerline()
 
   info 'Installing Monaco for Powerline for the current user'
   if [ "${DF_DRY_RUN:-0}" -eq 1 ]; then
-    printf '    download %s\n' "$download_url_"
+    printf '    download %s\n' "$DF_MONACO_FONT_URL"
     printf '    install font as %s\n' "$font_path_"
     return 0
   fi
@@ -291,7 +292,7 @@ ensure_monaco_for_powerline()
     downloaded_font_="$temporary_/Monaco_Linux-Powerline.ttf"
     trap 'rm -rf "${temporary_:?}"' EXIT HUP INT TERM
 
-    curl --fail --location --retry 3 --output "$downloaded_font_" "$download_url_"
+    curl --fail --location --retry 3 --output "$downloaded_font_" "$DF_MONACO_FONT_URL"
     signature_="$(od -An -tx1 -N4 "$downloaded_font_" | tr -d ' \n')"
     case "$signature_" in
       00010000|4f54544f|74746366)
