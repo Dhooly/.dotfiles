@@ -93,6 +93,28 @@ check_link()
   check_link_paths "$HOME/$relative_" "$DF_ROOT/$relative_" "$relative_"
 }
 
+check_ghostty_themes()
+{
+  local source_
+  local theme_
+
+  if [ ! -d "$DF_ROOT/.config/ghostty/themes" ]; then
+    return 0
+  fi
+
+  for source_ in "$DF_ROOT"/.config/ghostty/themes/*; do
+    if [ ! -f "$source_" ]; then
+      continue
+    fi
+
+    theme_="$(basename "$source_")"
+    check_link_paths \
+      "$HOME/.config/ghostty/themes/$theme_" \
+      "$source_" \
+      "Ghostty theme: $theme_"
+  done
+}
+
 parse_arguments()
 {
   while [ "$#" -gt 0 ]; do
@@ -124,7 +146,7 @@ parse_arguments()
 main()
 {
   local relative_
-  local links_=(.config/ghostty .config/nvim .gitconfig .tmux.conf .zprofile .zshrc)
+  local links_=(.config/nvim .gitconfig .tmux.conf .zprofile .zshrc)
 
   parse_arguments "$@"
 
@@ -167,6 +189,11 @@ main()
   check_optional_command 'zoxide' zoxide
 
   info 'Configuration links'
+  check_link_paths \
+    "$HOME/.config/ghostty/config" \
+    "$DF_ROOT/.config/ghostty/config" \
+    'Ghostty config'
+  check_ghostty_themes
   for relative_ in "${links_[@]}"; do
     check_link "$relative_"
   done

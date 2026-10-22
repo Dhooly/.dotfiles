@@ -111,6 +111,10 @@ Machine-specific settings belong in ignored local files:
 - `~/.tmux.conf.local` for machine-specific tmux settings
 - `~/.gitconfig.local` for identity, signing, and credential settings
 
+The Ghostty config and repo-managed themes are linked individually. The local
+`~/.config/ghostty/themes/` directory remains in place, so additional
+machine-specific themes are preserved.
+
 For example:
 
 ```ini

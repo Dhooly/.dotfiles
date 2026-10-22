@@ -90,11 +90,66 @@ preserve_local_git_config()
   fi
 }
 
+prepare_ghostty_config_directory()
+{
+  local directory_="$HOME/.config/ghostty"
+  local repository_directory_="$DF_ROOT/.config/ghostty"
+  local current_=''
+  local current_path_=''
+  local backup_="$DF_BACKUP_ROOT/.config/ghostty-directory-link"
+
+  if [ ! -L "$directory_" ]; then
+    return 0
+  fi
+
+  current_="$(strip_trailing_slash "$(readlink "$directory_")")"
+  case "$current_" in
+    /*)
+      current_path_="$current_"
+      ;;
+    *)
+      current_path_="$(dirname "$directory_")/$current_"
+      ;;
+  esac
+
+  if [ ! -e "$current_path_" ] ||
+    [ "$(canonical_existing_path "$current_path_")" != "$(canonical_existing_path "$repository_directory_")" ]; then
+    return 0
+  fi
+
+  info 'Migrating the Ghostty directory link to a config-file link'
+  run mkdir -p "$(dirname "$backup_")"
+  run mv "$directory_" "$backup_"
+  run mkdir -p "$directory_"
+}
+
+link_ghostty_themes()
+{
+  local source_
+  local theme_
+
+  if [ ! -d "$DF_ROOT/.config/ghostty/themes" ]; then
+    return 0
+  fi
+
+  for source_ in "$DF_ROOT"/.config/ghostty/themes/*; do
+    if [ ! -f "$source_" ]; then
+      continue
+    fi
+
+    theme_="$(basename "$source_")"
+    link_paths \
+      "$source_" \
+      "$HOME/.config/ghostty/themes/$theme_" \
+      ".config/ghostty/themes/$theme_" \
+      "Ghostty theme: $theme_"
+  done
+}
+
 link_dotfiles()
 {
   local relative_
   local links_=(
-    .config/ghostty
     .config/nvim
     .gitconfig
     .tmux.conf
@@ -107,6 +162,13 @@ link_dotfiles()
 
   info 'Linking dotfiles'
   preserve_local_git_config
+  prepare_ghostty_config_directory
+  link_paths \
+    "$DF_ROOT/.config/ghostty/config" \
+    "$HOME/.config/ghostty/config" \
+    '.config/ghostty/config' \
+    'Ghostty config'
+  link_ghostty_themes
   for relative_ in "${links_[@]}"; do
     link_one "$relative_"
   done
