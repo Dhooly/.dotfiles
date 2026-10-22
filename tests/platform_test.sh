@@ -13,7 +13,10 @@ trap 'rm -rf "${TEST_TMP:?}"' EXIT HUP INT TERM
 # shellcheck source=../scripts/lib/packages.sh
 . "$TEST_ROOT/scripts/lib/packages.sh"
 
-EXPECTED_MONACO_FONT_URL='https://gist.github.com/dsc8x/1634235/raw/4691e901750591f9cab0b4ae8b7c0731ebf28cce/Monaco_Linux-Powerline.ttf'
+grep -Fxq 'font-family = "JetBrains Mono"' "$TEST_ROOT/.config/ghostty/config" || {
+  printf 'FAIL: Ghostty does not explicitly select JetBrains Mono\n' >&2
+  exit 1
+}
 
 assert_equal()
 {
@@ -55,22 +58,6 @@ assert_array_excludes()
   done
 }
 
-assert_contains()
-{
-  local expected_="$1"
-  local actual_="$2"
-  local label_="$3"
-
-  case "$actual_" in
-    *"$expected_"*)
-      return 0
-      ;;
-  esac
-
-  printf 'FAIL: %s does not contain %s\n' "$label_" "$expected_" >&2
-  exit 1
-}
-
 write_os_release()
 {
   local id_="$1"
@@ -101,15 +88,12 @@ test_linux_distribution ubuntu debian debian apt
 test_linux_distribution debian '' debian apt
 test_linux_distribution pop 'ubuntu debian' debian apt
 
-assert_equal "$EXPECTED_MONACO_FONT_URL" "$DF_MONACO_FONT_URL" 'Monaco font source URL'
-
 test_linux_distribution cachyos arch arch pacman
 select_packages core
 assert_array_contains zsh "${DF_PACKAGES[@]}"
 assert_array_excludes ghostty "${DF_PACKAGES[@]}"
 select_packages full
 assert_array_contains ghostty "${DF_PACKAGES[@]}"
-assert_array_contains ttf-meslo-nerd "${DF_PACKAGES[@]}"
 
 # Exercise the complete CachyOS path without requiring Pacman on the CI host.
 mkdir -p "$TEST_TMP/home"
@@ -125,24 +109,9 @@ DOTFILES_OS_RELEASE_FILE="$TEST_TMP/does-not-exist"
 detect_platform
 assert_equal macos "$DF_OS" 'macOS OS'
 assert_equal brew "$DF_PACKAGE_MANAGER" 'macOS package manager'
-
-# Monaco for Powerline uses the native per-user font directory on each OS.
-DF_DRY_RUN=1
-HOME="$TEST_TMP/mac-home"
-DF_FAMILY='macos'
-monaco_output_="$(ensure_monaco_for_powerline)"
-assert_contains \
-  "$HOME/Library/Fonts/Monaco_Linux-Powerline.ttf" \
-  "$monaco_output_" \
-  'macOS Monaco font destination'
-
-HOME="$TEST_TMP/linux-home"
-DF_FAMILY='arch'
-monaco_output_="$(ensure_monaco_for_powerline)"
-assert_contains \
-  "$HOME/.local/share/fonts/Monaco_Linux-Powerline.ttf" \
-  "$monaco_output_" \
-  'Linux Monaco font destination'
+select_packages full
+assert_array_contains ghostty "${DF_CASKS[@]}"
+assert_array_excludes font-meslo-lg-nerd-font "${DF_CASKS[@]}"
 
 printf 'All platform detection tests passed.\n'
 

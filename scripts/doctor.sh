@@ -115,6 +115,33 @@ check_ghostty_themes()
   done
 }
 
+check_ghostty_font()
+{
+  local ghostty_command_=''
+  local face_=''
+
+  if command_exists ghostty; then
+    ghostty_command_="$(command -v ghostty)"
+  elif [ -x /Applications/Ghostty.app/Contents/MacOS/ghostty ]; then
+    ghostty_command_='/Applications/Ghostty.app/Contents/MacOS/ghostty'
+  else
+    warn 'Missing: Ghostty'
+    DF_FAILURES=$((DF_FAILURES + 1))
+    return
+  fi
+
+  face_="$("$ghostty_command_" +show-face --string=A 2>/dev/null || true)"
+  case "$face_" in
+    *'JetBrains Mono'*)
+      success 'Ghostty resolves text to JetBrains Mono'
+      ;;
+    *)
+      warn 'Ghostty does not resolve text to JetBrains Mono'
+      DF_FAILURES=$((DF_FAILURES + 1))
+      ;;
+  esac
+}
+
 parse_arguments()
 {
   while [ "$#" -gt 0 ]; do
@@ -189,13 +216,8 @@ main()
   check_optional_command 'zoxide' zoxide
 
   if [ "$DF_PROFILE" = 'full' ]; then
-    info 'Fonts'
-    if monaco_for_powerline_is_installed; then
-      success 'Monaco for Powerline is installed'
-    else
-      warn 'Monaco for Powerline is not installed'
-      DF_FAILURES=$((DF_FAILURES + 1))
-    fi
+    info 'Ghostty'
+    check_ghostty_font
   fi
 
   info 'Configuration links'

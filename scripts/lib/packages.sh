@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-DF_MONACO_FONT_URL='https://gist.github.com/dsc8x/1634235/raw/4691e901750591f9cab0b4ae8b7c0731ebf28cce/Monaco_Linux-Powerline.ttf'
-
 ensure_homebrew()
 {
   local brew_command_=''
@@ -183,136 +181,6 @@ ensure_current_neovim()
   fi
 }
 
-ensure_nerd_font()
-{
-  local font_parent_="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
-  local font_root_="$font_parent_/MesloLGS-Nerd-Font"
-  local download_url_='https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip'
-  local font_=''
-
-  if [ "$DF_FAMILY" = 'macos' ]; then
-    return 0
-  fi
-
-  if command_exists fc-match && fc-match 'MesloLGS Nerd Font' 2>/dev/null | grep -Fqi 'Meslo'; then
-    success 'MesloLGS Nerd Font is installed'
-    return 0
-  fi
-
-  for font_ in "$font_root_"/*.ttf "$font_root_"/*.otf; do
-    if [ -e "$font_" ]; then
-      success 'MesloLGS Nerd Font is installed'
-      return 0
-    fi
-  done
-
-  info 'Installing MesloLGS Nerd Font for the current user'
-  if [ "${DF_DRY_RUN:-0}" -eq 1 ]; then
-    printf '    download %s\n' "$download_url_"
-    printf '    install fonts into %s\n' "$font_root_"
-    return 0
-  fi
-
-  (
-    local temporary_
-    local archive_
-    local extracted_
-
-    temporary_="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-font.XXXXXX")"
-    archive_="$temporary_/Meslo.zip"
-    extracted_="$temporary_/Meslo"
-    trap 'rm -rf "${temporary_:?}"' EXIT HUP INT TERM
-
-    curl --fail --location --retry 3 --output "$archive_" "$download_url_"
-    mkdir -p "$extracted_" "$font_root_"
-    unzip -q "$archive_" -d "$extracted_"
-    find "$extracted_" -type f \( -name '*.ttf' -o -name '*.otf' \) -exec cp {} "$font_root_/" \;
-
-    if ! find "$font_root_" -type f \( -name '*.ttf' -o -name '*.otf' \) -print -quit | grep -q .; then
-      die 'The downloaded Nerd Font archive did not contain any fonts.'
-    fi
-
-    if command_exists fc-cache; then
-      fc-cache -f "$font_root_"
-    fi
-  )
-}
-
-monaco_for_powerline_is_installed()
-{
-  local ghostty_command_=''
-
-  if command_exists fc-match &&
-    fc-match --format='%{family}\n' 'Monaco for Powerline' 2>/dev/null |
-      grep -Fi 'Monaco for Powerline' >/dev/null; then
-    return 0
-  fi
-
-  if command_exists ghostty; then
-    ghostty_command_="$(command -v ghostty)"
-  elif [ -x /Applications/Ghostty.app/Contents/MacOS/ghostty ]; then
-    ghostty_command_='/Applications/Ghostty.app/Contents/MacOS/ghostty'
-  fi
-
-  [ -n "$ghostty_command_" ] &&
-    "$ghostty_command_" +list-fonts 2>/dev/null |
-      grep -Fx 'Monaco for Powerline' >/dev/null
-}
-
-ensure_monaco_for_powerline()
-{
-  local font_root_=''
-  local font_path_=''
-
-  if monaco_for_powerline_is_installed; then
-    success 'Monaco for Powerline is installed'
-    return 0
-  fi
-
-  if [ "$DF_FAMILY" = 'macos' ]; then
-    font_root_="$HOME/Library/Fonts"
-  else
-    font_root_="${XDG_DATA_HOME:-$HOME/.local/share}/fonts"
-  fi
-  font_path_="$font_root_/Monaco_Linux-Powerline.ttf"
-
-  info 'Installing Monaco for Powerline for the current user'
-  if [ "${DF_DRY_RUN:-0}" -eq 1 ]; then
-    printf '    download %s\n' "$DF_MONACO_FONT_URL"
-    printf '    install font as %s\n' "$font_path_"
-    return 0
-  fi
-
-  (
-    local temporary_
-    local downloaded_font_
-    local signature_
-
-    temporary_="$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-monaco-font.XXXXXX")"
-    downloaded_font_="$temporary_/Monaco_Linux-Powerline.ttf"
-    trap 'rm -rf "${temporary_:?}"' EXIT HUP INT TERM
-
-    curl --fail --location --retry 3 --output "$downloaded_font_" "$DF_MONACO_FONT_URL"
-    signature_="$(od -An -tx1 -N4 "$downloaded_font_" | tr -d ' \n')"
-    case "$signature_" in
-      00010000|4f54544f|74746366)
-        ;;
-      *)
-        die 'The Monaco for Powerline download is not a recognized font file.'
-        ;;
-    esac
-
-    mkdir -p "$font_root_"
-    install -m 0644 "$downloaded_font_" "$font_path_"
-
-    if [ "$DF_FAMILY" != 'macos' ] && command_exists fc-cache; then
-      fc-cache -f "$font_root_"
-    fi
-  )
-
-  success 'Installed Monaco for Powerline'
-}
-
 select_packages()
 {
   local profile_="$1"
@@ -330,7 +198,7 @@ select_packages()
       fi
       if [ "$profile_" = 'full' ]; then
         DF_PACKAGES+=(podman)
-        DF_CASKS=(font-meslo-lg-nerd-font ghostty)
+        DF_CASKS=(ghostty)
       fi
       ;;
     fedora)
@@ -363,7 +231,7 @@ select_packages()
         )
       fi
       if [ "$profile_" = 'full' ]; then
-        DF_PACKAGES+=(ghostty podman podman-compose ttf-meslo-nerd)
+        DF_PACKAGES+=(ghostty podman podman-compose)
       fi
       ;;
     debian)
@@ -432,10 +300,5 @@ install_packages()
   fi
 
   ensure_current_neovim
-
-  if [ "$profile_" = 'full' ]; then
-    ensure_monaco_for_powerline
-    ensure_nerd_font
-  fi
 }
 

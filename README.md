@@ -54,7 +54,7 @@ useful for remote machines and containers.
 | --- | --- |
 | `core` | Zsh, Oh My Zsh, Git, Neovim, tmux, and modern CLI tools |
 | `dev` | Core plus C/C++, CMake, Ninja, debuggers, Python, Node.js, and shell tooling |
-| `full` | Dev plus Ghostty, Monaco for Powerline, a Nerd Font fallback, and Podman where packaged |
+| `full` | Dev plus Ghostty and Podman where packaged |
 
 Choose a profile with:
 
@@ -73,8 +73,8 @@ Zsh, tmux plugins, or the default-shell change.
   portable clipboard integration, and seamless Neovim pane navigation
 - Neovim with the existing Gruvbox, Telescope, Treesitter, Harpoon, Bufferline,
   Git, tmux, and C/C++ workflow
-- Ghostty with the One Half Dark Vibrant theme, Monaco for Powerline, and a
-  Meslo Nerd Font fallback; plus tmux with true-color support
+- Ghostty with the One Half Dark Vibrant theme and its bundled JetBrains Mono
+  font; plus tmux with true-color support
 - Git defaults that favor safe rebases, pruning, `rerere`, and readable diffs
 - CLI tools including `ripgrep`, `fd`, `fzf`, `bat`, `eza`, `jq`, `yq`,
   `zoxide`, `direnv`, GitHub CLI, lazygit, and delta when the distribution
@@ -87,10 +87,9 @@ Package availability differs between distributions. The installer checks each
 Linux repository and skips unavailable optional packages with a warning. Run
 the doctor afterward to see exactly what is present.
 
-Monaco for Powerline is installed per-user from an immutable revision of the
-community-patched font. The source does not publish clear redistribution terms,
-so review the source URL in `scripts/lib/packages.sh` before using this setup
-outside a personal dotfiles repository.
+Ghostty renders regular text with its bundled JetBrains Mono font and draws the
+Agnoster Powerline separators with its internal sprites, matching the macOS
+setup without installing additional font files.
 
 The Neovim configuration requires Neovim 0.11 or newer. When a Linux
 distribution ships an older build, the bootstrap installs Neovim's official
